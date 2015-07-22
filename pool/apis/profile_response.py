@@ -5,11 +5,15 @@ from profiles.models import Profile, Course, CourseType
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 from tastypie.exceptions import ImmediateHttpResponse
+from django.conf.urls import url
+from tastypie.utils import trailing_slash
+from django.contrib.auth import authenticate
+from django.contrib.auth import login as lin
+from django.contrib.auth import logout  as lout
 
 class CourseTypeResource(resources.ModelResource):
     class Meta:
         queryset = CourseType.objects.all()
-
         fields = ['id', 'name']
         allowed_methods = ['get']
         resource_name = 'course-type'
@@ -19,7 +23,6 @@ class CourseTypeResource(resources.ModelResource):
 class PrivateUserResource(resources.ModelResource):
     class Meta:
         queryset = User.objects.all()
-
         excludes = ['password', 'is_active', 'is_staff', 'is_superuser']
         resource_name = 'private-user'
         filtering = {'id': ('exact',)}
@@ -72,12 +75,48 @@ class PrivateCourseResource(resources.ModelResource):
 class PublicUserResource(resources.ModelResource):
     class Meta:
         queryset = User.objects.all()
-
         excludes = ['email', 'password', 'is_active', 'is_staff', 'is_superuser']
         resource_name = 'user'
-        allowed_methods = ['get']
+        allowed_methods = ['get', 'post']
         filtering = {'id': ('exact',)}
 
+    def override_urls(self):
+        return [
+            url(r"^(?P<resource_name>{})/login{}$".format(self._meta.resource_name, trailing_slash),
+                self.wrap_view('login'),
+                name='api_login'),
+            url(r"^(?P<resource_name>{})/logout{}$".format(self._meta.resource_name, trailing_slash),
+                self.wrap_view('logout'),
+                name='api_logout'),
+        ]
+
+    def login(self, request, **kwargs):
+        self.method_check(request, allowed=['post'])
+
+        data = self.deserealize(request.body, format=request.META.get('CONTENT_TYPE', 'application/json'))
+        username = data.get('username', '')
+        password = data.get('password', '')
+        user = authenticate(username=username, password=password)
+
+        if user:
+            if user.is_active:
+                lin(request, user)
+                raise ImmediateHttpResponse(response=HttpResponse(
+                                            content=json.dumps({'success': True}),
+                                            status=200
+                                        ))
+        raise ImmediateHttpResponse(response=HttpResponse(
+                                            content=json.dumps({'success': False}),
+                                            status=403
+                                        ))
+
+
+    def logout(self, request, **kwargs):
+        self.method_check(request, allowed=['get'])
+        if request.user:
+            lout(request)
+
+    
 class PublicProfileResource(resources.ModelResource):
     user = fields.ForeignKey(PublicUserResource, 'user')
 

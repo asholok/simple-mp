@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<script type="text/javascript">
+    ProfileModel = Backbone.Model.extend({
+        
+        initialize: function() {
+        },
+
+        urlRoot: function() {
+            return '/api/v1/profile';
+        },
+
+    });
+
+    Profiles = Backbone.Collection.extend({
+        
+        model: ProfileModel,
+
+        url : '/api/v1/profile/',
+    });
+
+    var profile = new ProfileModel({ id: 1 });
+
+    profile.fetch({
+        success: function(profile) {
+            u = profile.toJSON();
+            alert(u["user"]);
+        }
+    });
+
+    CollectionProfiles = new Profiles
+
+    // ListItem = Backbone.View.extend({
+        
+    //     tagName: 'div',
+
+    //     initialize: function(model, options) {
+    //         this.options = options;
+    //     },
+
+    //     template: _.template("<div> username: <%- username %>, email: <%- email %>, id: <%- id  %> </div>"),
+
+    //     render: function() {
+    //         this.$el.html(this.template(this.model.toJSON()));
+    //     }
+
+    // });
+
+    // ExampleList = Backbone.View.extend({
+        
+    //     el: '#booka',
+
+    //     initialize: function(options) {
+    //         this.listenTo(CollectionProfiles, 'reset', this.addAll, this);
+    //     },
+
+    //     addOne: function(model) {
+    //         var view = new ListItem ({ model : model });
+    //         console.log(view.render().el);
+    //         this.$el.append(view.render().el);
+    //     },
+
+    //     addAll: function() {
+    //         var sample = this;
+    //         Profiles.each(function(model){
+    //             sample.addOne(model);
+    //         });
+    //     },
+
+    //     render : function() {
+    //         this.$el.html(this.template());
+    //         return this;
+    //     } 
+    // });
+
+    // CollectionProfiles.fetch({ reset : true })
+
+</script>
+<h5>BooBaa</h5>
+<div id="booka"></div>
+{% endblock %}

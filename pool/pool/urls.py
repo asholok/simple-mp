@@ -17,7 +17,7 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from tastypie.api import Api
 from django.views.generic import TemplateView
-from apis.pofile_response import *
+from apis.profile_response import *
 
 v1_api = Api(api_name='v1')
 v1_api.register(PrivateUserResource())
@@ -26,8 +26,7 @@ v1_api.register(PrivateCourseResource())
 v1_api.register(PublicUserResource())
 v1_api.register(PublicProfileResource())
 v1_api.register(PublicCourseResource())
-v1_api.register(CreateProfileResource())
-v1_api.register(CreateCourseResource())
+
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
