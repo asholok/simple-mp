@@ -142,9 +142,7 @@ class PublicProfileResource(resources.ModelResource):
                 )
 
             bundle.data['user'] = user
-            print bundle.data
             super(PublicProfileResource, self).obj_create(bundle, request=request, **kwargs)
-            print 'Nope not me'
 
              
 

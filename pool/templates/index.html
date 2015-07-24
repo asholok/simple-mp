@@ -3,6 +3,7 @@
 
 {% block content %}
 <script type="text/javascript">
+$(function(){
     ProfileModel = Backbone.Model.extend({
         
         initialize: function() {
@@ -21,35 +22,45 @@
         url : '/api/v1/profile/',
     });
 
-    var profile = new ProfileModel({ id: 1 });
+    // var profile = new ProfileModel({ id: 1 });
 
-    profile.fetch({
-        success: function(profile) {
-            u = profile.toJSON();
-            alert(u['user']);
+    // profile.fetch({
+    //     success: function(profile) {
+    //         var u = profile.toJSON();
+    //         alert(u['country']);
+    //     }
+    // });
+    // alert(profile.toJSON());
+
+    // CollectionProfiles = new Profiles;
+
+
+
+    ProfileView = Backbone.View.extend({
+        
+        el: '#booka',
+
+        initialize: function() {
+            _.bindAll(this, 'render');
+            this.model = new ProfileModel();
+            var that = this;
+            this.model.fetch({
+                success: function(profile) {
+                    that.render(profile.toJSON());
+                }
+            });
+        },
+
+        template: _.template("<div> country: <%- country %>, ionfo: <%- user_desciption %>, city: <%- city  %> </div>"),
+
+        render: function(n) {
+            alert(JSON.stringify(n));
+            this.$el.html(this.template(n));
         }
+
     });
 
-
-    CollectionProfiles = new Profiles
-
-
-
-    // ListItem = Backbone.View.extend({
-        
-    //     tagName: 'div',
-
-    //     initialize: function(model, options) {
-    //         this.options = options;
-    //     },
-
-    //     template: _.template("<div> username: <%- username %>, email: <%- email %>, id: <%- id  %> </div>"),
-
-    //     render: function() {
-    //         this.$el.html(this.template(this.model.toJSON()));
-    //     }
-
-    // });
+    return new ProfileView()
 
     // ExampleList = Backbone.View.extend({
         
@@ -79,7 +90,7 @@
     // });
 
     // CollectionProfiles.fetch({ reset : true })
-
+})
 </script>
 <h5>BooBaa</h5>
 <div id="booka"></div>
