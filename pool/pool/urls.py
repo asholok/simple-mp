@@ -31,5 +31,6 @@ v1_api.register(PublicCourseResource())
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^api/', include(v1_api.urls)),
+    url(r'^profile/', include('profiles.urls', namespace='profile')),
     url(r'^$', TemplateView.as_view(template_name='index.html'), name='home'),
 ]
