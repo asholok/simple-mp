@@ -12,6 +12,7 @@
 <body>
     {% if request.user.is_active %} 
         <div> in {{request.user.username}} </div>
+        <div> id {{request.user.id}} </div>
         <a href="{% url 'profile:logout' %}">Logout</a>
     {% else %}
         <form action="{% url 'profile:login' %}" method="POST">

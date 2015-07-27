@@ -24,32 +24,33 @@ class PrivateUserResource(resources.ModelResource):
     class Meta:
         queryset = User.objects.all()
         excludes = ['password', 'is_active', 'is_staff', 'is_superuser']
-        resource_name = 'private-user'
+        resource_name = 'private_user'
         filtering = {'id': ('exact',)}
         authorization = Authorization()
 
 class PrivateProfileResource(resources.ModelResource):
-    user = fields.ForeignKey(PrivateUserResource, 'private-user')
+    user = fields.ForeignKey(PrivateUserResource, 'private_user')
 
     class Meta:
         queryset = Profile.objects.all()
-        resource_name = 'private-profile'
+        resource_name = 'private_profile'
         fields = ['user', 'zip_code', 'country', 'city', 'user_desciption']
         allowed_methods = ['get', 'put']
         always_return_data = True
         authorization = Authorization()
         filtering = {'private-user': resources.ALL_WITH_RELATIONS}
 
-    def apply_authorization_limits(self, request, object_list):
-        return object_list.filter(user=request.user)
+    def authorized_update_list(self, object_list, bundle):
+        print 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+        return object_list.filter(user=bundle.request.user)
 
 class PrivateCourseResource(resources.ModelResource):
-    owner = fields.ForeignKey(PrivateProfileResource, 'private-profile')
-    course_type = fields.ForeignKey(CourseTypeResource, 'course-type')
+    owner = fields.ForeignKey(PrivateProfileResource, 'private_profile')
+    course_type = fields.ForeignKey(CourseTypeResource, 'course_type')
 
     class Meta:
         queryset = Course.objects.all()
-        resource_name = 'private-course'
+        resource_name = 'private_course'
         fields = ['course_name', 'course_type', 'course_desciption', 'owner']
         allowed_methods = ['get', 'put', ]
         always_return_data = True
@@ -65,8 +66,8 @@ class PrivateCourseResource(resources.ModelResource):
         
         return super(PrivateCourseResource, self).obj_create(bundle, request, **kwargs)
 
-    def apply_authorization_limits(self, request, object_list):
-        return object_list.filter(user=request.user)
+    def authorized_update_list(self, object_list, bundle):
+        return object_list.filter(user=bundle.request.user)
 
 """ ***************** End Private ********************************************* """
 

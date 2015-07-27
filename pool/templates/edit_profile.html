@@ -2,10 +2,23 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
+<script type="text/template" id="templateForm">
+    <form id="profileForm">
+        {% csrf_token %}
+        <label>country: </label>
+        <input name="country" type="text" id="country" value="<%= country %>"><br/>
+        <label>city: </label>
+        <input name="city" type="text" id="city" value="<%= city %>"><br/>
+        <label>zip code: </label>
+        <input name="zip_code" type="text" id="zip_code" value="<%= zip_code %>"><br/>
+        <label>about your self: </label>
+        <input name="user_desciption" type="text" id="user_desciption" value="<%= user_desciption %>"><br/>
+        <input type="submit" id="change" value="Change">
+    </form>
+</script>
 <script type="text/javascript">
 $(function(){
-
-
+    
     ProfileModel = Backbone.Model.extend({
         urlRoot: '/api/v1/private-profile/',
         defaults: {
@@ -22,8 +35,14 @@ $(function(){
             'click #change': 'submitUpdate'
         },
         initialize: function() {
-            _.bindAll(this, 'submitUpdate');
+            _.bindAll(this, 'submitUpdate', 'render');
             this.model = new ProfileModel();
+            var that = this;
+            this.model.fetch({
+                success: function(profile){
+                    that.render(profile.toJSON());
+                }
+            })
         },
         submitUpdate: function() {
             var form = this.$el;
@@ -34,8 +53,12 @@ $(function(){
             unindexed_array.forEach(function(n){
                 data[n.name] = n.value;
             });             
-            self.model.set(data);
+            self.model.set( data );
             self.model.save();
+        },
+        render: function(n) {
+            var template = _.template( $("#templateForm").html(), n );
+            this.$el.html( template );
         },
     });
 
@@ -43,22 +66,6 @@ $(function(){
 })
 </script>
 <h5>Vaaavaaa</h5>
-<form id="profileForm">
-    {% csrf_token %}
-    <label>username: </label>
-    <input name="username" type="text" id="username" value=""><br/>
-    <label>password: </label>
-    <input name="password" type="password" id="password" value=""><br/>
-    <label>email: </label>
-    <input name="email" type="text" id="email" value=""><br/>
-    <label>country: </label>
-    <input name="country" type="text" id="country" value=""><br/>
-    <label>city: </label>
-    <input name="city" type="text" id="city" value=""><br/>
-    <label>zip code: </label>
-    <input name="zip_code" type="text" id="zip_code" value=""><br/>
-    <label>about your self: </label>
-    <input name="user_desciption" type="text" id="user_desciption" value=""><br/>
-    <input type="submit" id="change" value="Go">
-</form>
+<div id="profileForm"></div>
+
 {% endblock %}

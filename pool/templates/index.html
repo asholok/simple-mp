@@ -4,6 +4,17 @@
 {% block content %}
 <script type="text/javascript">
 $(function(){
+    RegistryUserModel = Backbone.Model.extend({
+        
+        initialize: function() {
+        },
+
+        urlRoot: function() {
+            return '/api/v1/private_profile/'; //?format=json&private-user__id={{request.user.id}}';
+        },
+
+    });
+
     ProfileModel = Backbone.Model.extend({
         
         initialize: function() {
@@ -22,14 +33,14 @@ $(function(){
         url : '/api/v1/profile/',
     });
 
-    // var profile = new ProfileModel({ id: 1 });
+    var profile = new RegistryUserModel();
 
-    // profile.fetch({
-    //     success: function(profile) {
-    //         var u = profile.toJSON();
-    //         alert(u['country']);
-    //     }
-    // });
+    profile.fetch({
+        success: function(profile) {
+            var u = profile.toJSON();
+            alert(JSON.stringify(u));
+        }
+    });
     // alert(profile.toJSON());
 
     // CollectionProfiles = new Profiles;
@@ -39,23 +50,28 @@ $(function(){
     ProfileView = Backbone.View.extend({
         
         el: '#booka',
+        tagName: 'div',
 
         initialize: function() {
             _.bindAll(this, 'render');
-            this.model = new ProfileModel();
+            this.collection = new Profiles();
             var that = this;
-            this.model.fetch({
+            this.collection.fetch({
                 success: function(profile) {
                     that.render(profile.toJSON());
                 }
             });
         },
 
-        template: _.template("<div> country: <%- country %>, ionfo: <%- user_desciption %>, city: <%- city  %> </div>"),
+        template: _.template("<div> country: <%= country %>, ionfo: <%= user_desciption %>, city: <%= city  %> </div>"),
 
-        render: function(n) {
-            alert(JSON.stringify(n));
-            this.$el.html(this.template(n));
+        render: function(profiles) {
+            // alert(JSON.stringify(n));
+            var that = this;
+            profiles.forEach(function(profile){
+                that.$el.append(that.template(profile))
+            });
+            // this.$el.html(this.template(n));
         }
 
     });
@@ -94,4 +110,5 @@ $(function(){
 </script>
 <h5>BooBaa</h5>
 <div id="booka"></div>
+
 {% endblock %}
